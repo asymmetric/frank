@@ -50,13 +50,11 @@ module Frank
       @context.define_tag("yield") do
         block.call
       end
-      (class << @context; self; end).class_eval do
-        define_method :tag_missing do |tag, attr, &block|
-          if locals.key?(tag.to_sym)
-            locals[tag.to_sym]
-          else
-            scope.__send__(tag)  # any way to support attr as args?
-          end
+      @context.define_singleton_method :tag_missing do |tag, attr, &block|
+        if locals.key?(tag.to_sym)
+          locals[tag.to_sym]
+        else
+          scope.__send__(tag)  # any way to support attr as args?
         end
       end
       # TODO: how to config tag prefix?
